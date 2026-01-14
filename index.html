@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <!-- =========================
+       META / ОСНОВНЫЕ НАСТРОЙКИ
+       ========================= -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Neon SaaS Gallery</title>
+
+  <!-- =========================
+       ШРИФТ
+       Используется современный UI-шрифт Inter
+       ========================= -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+  <!-- =========================
+       STYLES
+       Вся стилизация вынесена в один файл
+       (для продакшена рекомендуется разбить на модули)
+       ========================= -->
+  <style>
+    /* ---------- DESIGN TOKENS ----------
+       CSS-переменные — основа SaaS-архитектуры
+       позволяют легко менять тему, бренд, цвета
+    */
+    :root {
+      --bg: #0b0b0f;          /* Основной фон */
+      --card: #13131a;        /* Фон карточек */
+      --neon: #ff003c;        /* Акцентный неоновый красный */
+      --text: #eaeaf0;        /* Основной текст */
+      --muted: #9a9ab0;       /* Вторичный текст */
+    }
+
+    /* ---------- RESET ---------- */
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(circle at top, #140010, var(--bg));
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ---------- HEADER ----------
+       Верхняя панель (SaaS branding zone)
+    */
+    header {
+      padding: 24px 40px;
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      color: var(--neon);
+      text-shadow: 0 0 20px rgba(255,0,60,.6);
+    }
+
+    /* ---------- GRID ----------
+       Сетка карточек
+       auto-fill позволяет масштабироваться
+       до 10, 50, 500+ карточек
+    */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 24px;
+      padding: 40px;
+    }
+
+    /* ---------- CARD ----------
+       Маленькая карточка-превью
+    */
+    .card {
+      background: var(--card);
+      border-radius: 18px;
+      overflow: hidden;
+      cursor: pointer;
+      position: relative;
+      transition: transform .3s ease, box-shadow .3s ease;
+      box-shadow: 0 0 0 rgba(255,0,60,0);
+    }
+
+    /* Hover / Grow эффект */
+    .card:hover {
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 0 0 25px rgba(255,0,60,.5);
+    }
+
+    /* Изображение внутри карточки */
+    .card img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      filter: brightness(.9);
+    }
+
+    /* Затемняющий градиент для читаемости */
+    .card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent, rgba(0,0,0,.7));
+      pointer-events: none;
+    }
+
+    /* ---------- MODAL OVERLAY ----------
+       Полноэкранный контейнер модального окна
+    */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.8);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    /* Активное состояние */
+    .modal.active { display: flex; }
+
+    /* ---------- MODAL CONTENT ----------
+       Основное модальное окно
+    */
+    .modal-content {
+      width: 85vw;
+      height: 85vh;
+      background: #0f0f16;
+      border-radius: 24px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 0 40px rgba(255,0,60,.6);
+      animation: grow .4s ease;
+    }
+
+    /* Анимация появления */
+    @keyframes grow {
+      from { transform: scale(.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    /* ---------- MODAL HEADER ----------
+       Заголовок + кнопка закрытия
+    */
+    .modal-header {
+      padding: 16px 24px;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--neon);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      text-shadow: 0 0 15px rgba(255,0,60,.6);
+    }
+
+    .close {
+      cursor: pointer;
+      font-size: 22px;
+      color: var(--text);
+      transition: color .2s;
+    }
+
+    .close:hover { color: var(--neon); }
+
+    /* ---------- MEDIA ZONE ----------
+       85% пространства модального окна
+       Поддержка IMG / VIDEO
+    */
+    .modal-media {
+      flex: 0 0 85%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+    }
+
+    .modal-media img,
+    .modal-media video {
+      max-width: 100%;
+      max-height: 100%;
+    }
+
+    /* ---------- DESCRIPTION ----------
+       Текстовое описание проекта
+    */
+    .modal-description {
+      flex: 1;
+      padding: 20px 28px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.6;
+      overflow-y: auto;
+    }
+
+    /* ---------- FOOTER ----------
+       Информационная зона
+    */
+    footer {
+      padding: 16px 40px;
+      font-size: 12px;
+      color: var(--muted);
+      opacity: .6;
+    }
+  </style>
+</head>
+<body>
+
+<!-- =========================
+     HEADER / BRANDING
+     ========================= -->
+<header>NEON SAAS GALLERY</header>
+
+<!-- =========================
+     MAIN GRID
+     Карточки генерируются JS-скриптом
+     ========================= -->
+<main class="grid" id="grid"></main>
+
+<footer>SaaS-ready UI • scalable • modular • 2026 design</footer>
+
+<!-- =========================
+     MODAL WINDOW
+     ========================= -->
+<div class="modal" id="modal">
+  <div class="modal-content">
+
+    <!-- Заголовок модального окна -->
+    <div class="modal-header">
+      <span id="modalTitle"></span>
+      <span class="close" id="close">✕</span>
+    </div>
+
+    <!-- Медиа зона (изображение / видео) -->
+    <div class="modal-media" id="modalMedia"></div>
+
+    <!-- Описание -->
+    <div class="modal-description" id="modalDesc"></div>
+  </div>
+</div>
+
+<!-- =========================
+     SCRIPT
+     В продакшене вынести в отдельные модули
+     ========================= -->
+<script>
+  /* -------------------------
+     DATA LAYER (SaaS-ready)
+     -------------------------
+     Сейчас используется mock-данные.
+     В будущем заменяется на:
+     - REST API
+     - GraphQL
+     - Headless CMS
+     - Supabase / Firebase
+  */
+  const items = Array.from({ length: 20 }).map((_, i) => ({
+    id: i,
+    title: `Проект ${i + 1}`,
+    image: `https://picsum.photos/seed/neon${i}/800/600`,
+    description: 'Это пример описания проекта. Архитектура SaaS позволяет подключить backend, роли пользователей, подписки, аналитику и CDN.'
+  }));
+
+  /* -------------------------
+     DOM ELEMENTS CACHE
+     ------------------------- */
+  const grid = document.getElementById('grid');
+  const modal = document.getElementById('modal');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalMedia = document.getElementById('modalMedia');
+  const modalDesc = document.getElementById('modalDesc');
+  const close = document.getElementById('close');
+
+  /* -------------------------
+     RENDER CARDS
+     Ограничение до 50 элементов
+     ------------------------- */
+  items.slice(0, 50).forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'card';
+
+    // Миниатюра карточки
+    card.innerHTML = `<img src="${item.image}" alt="${item.title}">`;
+
+    // Открытие модального окна
+    card.onclick = () => {
+      modalTitle.textContent = item.title;
+      modalMedia.innerHTML = `<img src="${item.image}" alt="">`;
+      modalDesc.textContent = item.description;
+      modal.classList.add('active');
+    };
+
+    grid.appendChild(card);
+  });
+
+  /* -------------------------
+     MODAL CONTROLS
+     ------------------------- */
+  close.onclick = () => modal.classList.remove('active');
+
+  // Закрытие по клику на фон
+  modal.onclick = e => e.target === modal && modal.classList.remove('active');
+</script>
+
+</body>
+</html>
